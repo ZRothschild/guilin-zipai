@@ -1,0 +1,19 @@
+[package]
+name = "guilin-paizi-core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "桂林字牌核心对局引擎"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+rand.workspace = true
+thiserror.workspace = true
+uuid.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tokio-test.workspace = true

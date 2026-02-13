@@ -1,0 +1,19 @@
+[package]
+name = "guilin-paizi-skills"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "桂林字牌技能系统"
+
+[dependencies]
+guilin-paizi-core = { path = "../core" }
+
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tokio-test.workspace = true

@@ -1,0 +1,20 @@
+[package]
+name = "guilin-paizi-economy"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "桂林字牌经济系统（欢乐豆、段位、结算）"
+
+[dependencies]
+guilin-paizi-core = { path = "../core" }
+
+serde.workspace = true
+serde_json.workspace = true
+chrono.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tokio-test.workspace = true

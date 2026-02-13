@@ -1,0 +1,43 @@
+[package]
+name = "guilin-paizi-client"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "桂林字牌客户端（Yew + WASM）"
+
+[dependencies]
+guilin-paizi-core = { path = "../core" }
+
+serde.workspace = true
+serde_json.workspace = true
+yew.workspace = true
+yew-router.workspace = true
+wasm-bindgen.workspace = true
+wasm-bindgen-futures.workspace = true
+web-sys.workspace = true
+gloo.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+
+[dependencies.web-sys]
+version = "0.3"
+features = [
+  "console",
+  "Document",
+  "Element",
+  "HtmlElement",
+  "Window",
+  "Headers",
+  "Request",
+  "RequestInit",
+  "RequestMode",
+  "Response",
+  "WebSocket",
+  "MessageEvent",
+  "CloseEvent",
+  "ErrorEvent",
+]
+
+wasm-logger = "0.2"
