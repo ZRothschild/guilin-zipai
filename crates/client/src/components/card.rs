@@ -1,5 +1,5 @@
-use yew::prelude::*;
 use guilin_paizi_core::Card;
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct CardProps {
@@ -21,10 +21,14 @@ pub fn card_view(props: &CardProps) -> Html {
         if props.disabled { "disabled" } else { "" },
     );
 
-    let suit_class = if props.card.suit == guilin_paizi_core::Suit::Big { "big" } else { "small" };
+    let suit_class = if props.card.suit == guilin_paizi_core::Suit::Big {
+        "big"
+    } else {
+        "small"
+    };
 
     html! {
-        <div 
+        <div
             class={card_class}
             onclick={props.on_click.clone()}
         >

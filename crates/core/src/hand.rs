@@ -1,9 +1,9 @@
 use crate::card::Card;
-use crate::meld::{Meld, MeldType};
+use crate::meld::Meld;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Hand {
     cards: Vec<Card>,
     melds: Vec<Meld>,
@@ -106,10 +106,10 @@ mod tests {
             Card::new(Suit::Small, CardValue::Two),
         ];
         let mut hand = Hand::new(cards);
-        
+
         hand.add_card(Card::new(Suit::Small, CardValue::Three));
         assert_eq!(hand.len(), 3);
-        
+
         let removed = hand.remove_card(0);
         assert!(removed.is_some());
         assert_eq!(hand.len(), 2);
@@ -123,10 +123,10 @@ mod tests {
             Card::new(Suit::Small, CardValue::Two),
         ];
         let hand = Hand::new(cards);
-        
+
         let peng_card = Card::new(Suit::Small, CardValue::One);
         assert!(hand.can_peng(&peng_card));
-        
+
         let no_peng_card = Card::new(Suit::Small, CardValue::Two);
         assert!(!hand.can_peng(&no_peng_card));
     }

@@ -26,7 +26,7 @@ pub enum PlayerState {
     Disconnected,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Player {
     pub id: PlayerId,
     pub name: String,
@@ -76,7 +76,7 @@ mod tests {
         let mut player = Player::new("测试");
         player.set_ready();
         assert_eq!(player.state, PlayerState::Ready);
-        
+
         player.set_playing();
         assert_eq!(player.state, PlayerState::Playing);
     }

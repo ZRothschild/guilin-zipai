@@ -1,6 +1,5 @@
-use guilin_paizi_core::{GameState, PlayerId, Card};
+use guilin_paizi_core::{Card, GameState, PlayerId};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum SkillTrigger {
@@ -38,14 +37,11 @@ impl TriggerCondition {
                     false
                 }
             }
-            TriggerCondition::HuxiAbove(threshold) => {
-                game_state.calculate_hand_huxi(player_id)
-                    .map(|huxi| huxi >= *threshold)
-                    .unwrap_or(false)
-            }
-            TriggerCondition::InTing => {
-                game_state.can_hu(player_id).unwrap_or(false)
-            }
+            TriggerCondition::HuxiAbove(threshold) => game_state
+                .calculate_hand_huxi(player_id)
+                .map(|huxi| huxi >= *threshold)
+                .unwrap_or(false),
+            TriggerCondition::InTing => game_state.can_hu(player_id).unwrap_or(false),
             TriggerCondition::LastRounds(n) => {
                 let remaining = game_state.deck.remaining() as u8;
                 remaining <= *n

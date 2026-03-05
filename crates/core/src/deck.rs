@@ -1,7 +1,9 @@
 use crate::card::{Card, CardValue, Suit};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
+use serde::{Deserialize, Serialize};
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Deck {
     cards: Vec<Card>,
 }

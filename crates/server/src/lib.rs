@@ -7,3 +7,6 @@ pub mod anti_cheat;
 pub use server::GameServer;
 pub use room::{GameRoom, RoomState};
 pub use message::{ClientMessage, ServerMessage};
+
+#[cfg(test)]
+mod tests;

@@ -1,12 +1,12 @@
-use guilin_paizi_core::{GameState, GameAction, PlayerId};
+use guilin_paizi_core::{GameState, PlayerId};
 
+pub mod effect;
 pub mod skills;
 pub mod trigger;
-pub mod effect;
 
+pub use effect::{EffectHandler, EffectResult, SkillEffect, StandardEffectHandler};
 pub use skills::*;
-pub use trigger::{SkillTrigger, TriggerCondition};
-pub use effect::{SkillEffect, EffectResult};
+pub use trigger::{SkillTrigger, TriggerCondition, TriggerContext};
 
 pub trait Skill: Send + Sync {
     fn id(&self) -> u32;
@@ -15,7 +15,12 @@ pub trait Skill: Send + Sync {
     fn category(&self) -> SkillCategory;
     fn max_uses(&self) -> u8;
     fn can_use(&self, game_state: &GameState, player_id: PlayerId) -> bool;
-    fn use_skill(&mut self, game_state: &mut GameState, player_id: PlayerId, target: Option<PlayerId>) -> SkillResult;
+    fn use_skill(
+        &mut self,
+        game_state: &mut GameState,
+        player_id: PlayerId,
+        target: Option<PlayerId>,
+    ) -> SkillResult;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -81,7 +86,12 @@ impl SkillInstance {
         }
     }
 
-    pub fn try_use(&mut self, game_state: &mut GameState, player_id: PlayerId, target: Option<PlayerId>) -> SkillResult {
+    pub fn try_use(
+        &mut self,
+        game_state: &mut GameState,
+        player_id: PlayerId,
+        target: Option<PlayerId>,
+    ) -> SkillResult {
         if self.remaining_uses == 0 {
             return SkillResult::failure("技能使用次数已耗尽");
         }
@@ -91,7 +101,7 @@ impl SkillInstance {
         }
 
         let result = self.skill.use_skill(game_state, player_id, target);
-        
+
         if result.success {
             self.remaining_uses -= 1;
         }
@@ -112,9 +122,7 @@ impl SkillManager {
     }
 
     pub fn assign_skills(&mut self, player_id: PlayerId, skills: Vec<Box<dyn Skill>>) {
-        let instances: Vec<_> = skills.into_iter()
-            .map(|s| SkillInstance::new(s))
-            .collect();
+        let instances: Vec<_> = skills.into_iter().map(|s| SkillInstance::new(s)).collect();
         self.player_skills.insert(player_id, instances);
     }
 
@@ -122,11 +130,20 @@ impl SkillManager {
         self.player_skills.get(&player_id)
     }
 
-    pub fn get_player_skills_mut(&mut self, player_id: PlayerId) -> Option<&mut Vec<SkillInstance>> {
+    pub fn get_player_skills_mut(
+        &mut self,
+        player_id: PlayerId,
+    ) -> Option<&mut Vec<SkillInstance>> {
         self.player_skills.get_mut(&player_id)
     }
 
-    pub fn use_skill(&mut self, player_id: PlayerId, skill_idx: usize, game_state: &mut GameState, target: Option<PlayerId>) -> Option<SkillResult> {
+    pub fn use_skill(
+        &mut self,
+        player_id: PlayerId,
+        skill_idx: usize,
+        game_state: &mut GameState,
+        target: Option<PlayerId>,
+    ) -> Option<SkillResult> {
         if let Some(skills) = self.player_skills.get_mut(&player_id) {
             if let Some(instance) = skills.get_mut(skill_idx) {
                 return Some(instance.try_use(game_state, player_id, target));

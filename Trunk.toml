@@ -4,10 +4,15 @@ dist = "dist"
 public_url = "/"
 
 [serve]
-port = 8080
+port = 3000
 open = false
 
 [[hooks]]
 stage = "pre_build"
 command = "sh"
 command_arguments = ["-c", "cd crates/client && cargo build --target wasm32-unknown-unknown"]
+
+[[hooks]]
+stage = "pre_build"
+command = "sh"
+command_arguments = ["-c", "rustup target add wasm32-unknown-unknown 2>/dev/null || true"]

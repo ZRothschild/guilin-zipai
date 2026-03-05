@@ -1,5 +1,5 @@
-use yew::prelude::*;
 use guilin_paizi_core::player::{Player, PlayerState};
+use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 pub struct PlayerProps {

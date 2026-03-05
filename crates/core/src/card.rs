@@ -89,16 +89,76 @@ impl fmt::Display for Card {
             Suit::Big => "",
         };
         let value_str = match self.value {
-            CardValue::One => if self.suit == Suit::Big { "壹" } else { "一" },
-            CardValue::Two => if self.suit == Suit::Big { "贰" } else { "二" },
-            CardValue::Three => if self.suit == Suit::Big { "叁" } else { "三" },
-            CardValue::Four => if self.suit == Suit::Big { "肆" } else { "四" },
-            CardValue::Five => if self.suit == Suit::Big { "伍" } else { "五" },
-            CardValue::Six => if self.suit == Suit::Big { "陆" } else { "六" },
-            CardValue::Seven => if self.suit == Suit::Big { "柒" } else { "七" },
-            CardValue::Eight => if self.suit == Suit::Big { "捌" } else { "八" },
-            CardValue::Nine => if self.suit == Suit::Big { "玖" } else { "九" },
-            CardValue::Ten => if self.suit == Suit::Big { "拾" } else { "十" },
+            CardValue::One => {
+                if self.suit == Suit::Big {
+                    "壹"
+                } else {
+                    "一"
+                }
+            }
+            CardValue::Two => {
+                if self.suit == Suit::Big {
+                    "贰"
+                } else {
+                    "二"
+                }
+            }
+            CardValue::Three => {
+                if self.suit == Suit::Big {
+                    "叁"
+                } else {
+                    "三"
+                }
+            }
+            CardValue::Four => {
+                if self.suit == Suit::Big {
+                    "肆"
+                } else {
+                    "四"
+                }
+            }
+            CardValue::Five => {
+                if self.suit == Suit::Big {
+                    "伍"
+                } else {
+                    "五"
+                }
+            }
+            CardValue::Six => {
+                if self.suit == Suit::Big {
+                    "陆"
+                } else {
+                    "六"
+                }
+            }
+            CardValue::Seven => {
+                if self.suit == Suit::Big {
+                    "柒"
+                } else {
+                    "七"
+                }
+            }
+            CardValue::Eight => {
+                if self.suit == Suit::Big {
+                    "捌"
+                } else {
+                    "八"
+                }
+            }
+            CardValue::Nine => {
+                if self.suit == Suit::Big {
+                    "玖"
+                } else {
+                    "九"
+                }
+            }
+            CardValue::Ten => {
+                if self.suit == Suit::Big {
+                    "拾"
+                } else {
+                    "十"
+                }
+            }
         };
         write!(f, "{}{}", suit_str, value_str)
     }

@@ -1,51 +1,79 @@
-use crate::{Skill, SkillCategory, SkillResult, SkillInstance, SkillManager};
-use crate::trigger::{SkillTrigger, TriggerCondition, TriggerContext};
-use crate::effect::{SkillEffect, EffectResult, EconomyModifier, InformationType};
-use guilin_paizi_core::{GameState, PlayerId, GamePhase};
-use std::collections::HashMap;
+use crate::{Skill, SkillCategory, SkillResult};
+use guilin_paizi_core::{GamePhase, GameState, PlayerId};
 
 pub struct TingShiSkill;
 
 impl Skill for TingShiSkill {
-    fn id(&self) -> u32 { 1 }
-    fn name(&self) -> &str { "听势" }
-    fn description(&self) -> &str { "显示下家最近吃/碰牌的牌型倾向" }
-    fn category(&self) -> SkillCategory { SkillCategory::Information }
-    fn max_uses(&self) -> u8 { 2 }
-    
+    fn id(&self) -> u32 {
+        1
+    }
+    fn name(&self) -> &str {
+        "听势"
+    }
+    fn description(&self) -> &str {
+        "显示下家最近吃/碰牌的牌型倾向"
+    }
+    fn category(&self) -> SkillCategory {
+        SkillCategory::Information
+    }
+    fn max_uses(&self) -> u8 {
+        2
+    }
+
     fn can_use(&self, game_state: &GameState, _player_id: PlayerId) -> bool {
         game_state.phase == GamePhase::Playing
     }
-    
-    fn use_skill(&mut self, _game_state: &mut GameState, _player_id: PlayerId, _target: Option<PlayerId>) -> SkillResult {
-        SkillResult::success("下家牌型倾向分析完成")
-            .with_data(serde_json::json!({
-                "tendency": "顺型偏多",
-                "confidence": 0.65
-            }))
+
+    fn use_skill(
+        &mut self,
+        _game_state: &mut GameState,
+        _player_id: PlayerId,
+        _target: Option<PlayerId>,
+    ) -> SkillResult {
+        SkillResult::success("下家牌型倾向分析完成").with_data(serde_json::json!({
+            "tendency": "顺型偏多",
+            "confidence": 0.65
+        }))
     }
 }
 
 pub struct GuanLiuSkill;
 
 impl Skill for GuanLiuSkill {
-    fn id(&self) -> u32 { 2 }
-    fn name(&self) -> &str { "观流" }
-    fn description(&self) -> &str { "查看最近3张弃牌" }
-    fn category(&self) -> SkillCategory { SkillCategory::Information }
-    fn max_uses(&self) -> u8 { 3 }
-    
+    fn id(&self) -> u32 {
+        2
+    }
+    fn name(&self) -> &str {
+        "观流"
+    }
+    fn description(&self) -> &str {
+        "查看最近3张弃牌"
+    }
+    fn category(&self) -> SkillCategory {
+        SkillCategory::Information
+    }
+    fn max_uses(&self) -> u8 {
+        3
+    }
+
     fn can_use(&self, game_state: &GameState, _player_id: PlayerId) -> bool {
         game_state.phase == GamePhase::Playing && !game_state.discard_pile.is_empty()
     }
-    
-    fn use_skill(&mut self, game_state: &mut GameState, _player_id: PlayerId, _target: Option<PlayerId>) -> SkillResult {
-        let recent: Vec<String> = game_state.discard_pile.iter()
+
+    fn use_skill(
+        &mut self,
+        game_state: &mut GameState,
+        _player_id: PlayerId,
+        _target: Option<PlayerId>,
+    ) -> SkillResult {
+        let recent: Vec<String> = game_state
+            .discard_pile
+            .iter()
             .rev()
             .take(3)
             .map(|(_, card)| card.to_string())
             .collect();
-        
+
         SkillResult::success(format!("最近弃牌: {:?}", recent))
             .with_data(serde_json::json!({ "discards": recent }))
     }
@@ -54,17 +82,32 @@ impl Skill for GuanLiuSkill {
 pub struct SuanYuSkill;
 
 impl Skill for SuanYuSkill {
-    fn id(&self) -> u32 { 3 }
-    fn name(&self) -> &str { "算余" }
-    fn description(&self) -> &str { "提示桌面尚余特定牌张数" }
-    fn category(&self) -> SkillCategory { SkillCategory::Information }
-    fn max_uses(&self) -> u8 { 2 }
-    
+    fn id(&self) -> u32 {
+        3
+    }
+    fn name(&self) -> &str {
+        "算余"
+    }
+    fn description(&self) -> &str {
+        "提示桌面尚余特定牌张数"
+    }
+    fn category(&self) -> SkillCategory {
+        SkillCategory::Information
+    }
+    fn max_uses(&self) -> u8 {
+        2
+    }
+
     fn can_use(&self, game_state: &GameState, _player_id: PlayerId) -> bool {
         game_state.phase == GamePhase::Playing
     }
-    
-    fn use_skill(&mut self, game_state: &mut GameState, _player_id: PlayerId, _target: Option<PlayerId>) -> SkillResult {
+
+    fn use_skill(
+        &mut self,
+        game_state: &mut GameState,
+        _player_id: PlayerId,
+        _target: Option<PlayerId>,
+    ) -> SkillResult {
         let remaining = game_state.deck.remaining();
         SkillResult::success(format!("牌堆剩余 {} 张牌", remaining))
             .with_data(serde_json::json!({ "remaining": remaining }))
@@ -74,17 +117,32 @@ impl Skill for SuanYuSkill {
 pub struct MingSuanSkill;
 
 impl Skill for MingSuanSkill {
-    fn id(&self) -> u32 { 4 }
-    fn name(&self) -> &str { "明算" }
-    fn description(&self) -> &str { "展示当前牌池剩余牌总数" }
-    fn category(&self) -> SkillCategory { SkillCategory::Information }
-    fn max_uses(&self) -> u8 { 5 }
-    
+    fn id(&self) -> u32 {
+        4
+    }
+    fn name(&self) -> &str {
+        "明算"
+    }
+    fn description(&self) -> &str {
+        "展示当前牌池剩余牌总数"
+    }
+    fn category(&self) -> SkillCategory {
+        SkillCategory::Information
+    }
+    fn max_uses(&self) -> u8 {
+        5
+    }
+
     fn can_use(&self, game_state: &GameState, _player_id: PlayerId) -> bool {
         game_state.phase == GamePhase::Playing
     }
-    
-    fn use_skill(&mut self, game_state: &mut GameState, _player_id: PlayerId, _target: Option<PlayerId>) -> SkillResult {
+
+    fn use_skill(
+        &mut self,
+        game_state: &mut GameState,
+        _player_id: PlayerId,
+        _target: Option<PlayerId>,
+    ) -> SkillResult {
         let total = game_state.deck.remaining();
         SkillResult::success(format!("牌池剩余 {} 张", total))
             .with_data(serde_json::json!({ "deck_size": total }))
@@ -97,22 +155,39 @@ pub struct WenShouSkill {
 
 impl WenShouSkill {
     pub fn new() -> Self {
-        Self { undo_available: false }
+        Self {
+            undo_available: false,
+        }
     }
 }
 
 impl Skill for WenShouSkill {
-    fn id(&self) -> u32 { 5 }
-    fn name(&self) -> &str { "稳手" }
-    fn description(&self) -> &str { "出牌后2秒内可撤回1次" }
-    fn category(&self) -> SkillCategory { SkillCategory::ErrorCorrection }
-    fn max_uses(&self) -> u8 { 1 }
-    
+    fn id(&self) -> u32 {
+        5
+    }
+    fn name(&self) -> &str {
+        "稳手"
+    }
+    fn description(&self) -> &str {
+        "出牌后2秒内可撤回1次"
+    }
+    fn category(&self) -> SkillCategory {
+        SkillCategory::ErrorCorrection
+    }
+    fn max_uses(&self) -> u8 {
+        1
+    }
+
     fn can_use(&self, game_state: &GameState, _player_id: PlayerId) -> bool {
         game_state.phase == GamePhase::Playing && self.undo_available
     }
-    
-    fn use_skill(&mut self, _game_state: &mut GameState, _player_id: PlayerId, _target: Option<PlayerId>) -> SkillResult {
+
+    fn use_skill(
+        &mut self,
+        _game_state: &mut GameState,
+        _player_id: PlayerId,
+        _target: Option<PlayerId>,
+    ) -> SkillResult {
         self.undo_available = false;
         SkillResult::success("出牌已撤回")
     }
@@ -121,36 +196,65 @@ impl Skill for WenShouSkill {
 pub struct HuanChongSkill;
 
 impl Skill for HuanChongSkill {
-    fn id(&self) -> u32 { 6 }
-    fn name(&self) -> &str { "缓冲" }
-    fn description(&self) -> &str { "被点炮时最多减1番" }
-    fn category(&self) -> SkillCategory { SkillCategory::ErrorCorrection }
-    fn max_uses(&self) -> u8 { 1 }
-    
+    fn id(&self) -> u32 {
+        6
+    }
+    fn name(&self) -> &str {
+        "缓冲"
+    }
+    fn description(&self) -> &str {
+        "被点炮时最多减1番"
+    }
+    fn category(&self) -> SkillCategory {
+        SkillCategory::ErrorCorrection
+    }
+    fn max_uses(&self) -> u8 {
+        1
+    }
+
     fn can_use(&self, _game_state: &GameState, _player_id: PlayerId) -> bool {
         true
     }
-    
-    fn use_skill(&mut self, _game_state: &mut GameState, _player_id: PlayerId, _target: Option<PlayerId>) -> SkillResult {
-        SkillResult::success("番数减免已生效")
-            .with_data(serde_json::json!({ "fan_reduction": 1 }))
+
+    fn use_skill(
+        &mut self,
+        _game_state: &mut GameState,
+        _player_id: PlayerId,
+        _target: Option<PlayerId>,
+    ) -> SkillResult {
+        SkillResult::success("番数减免已生效").with_data(serde_json::json!({ "fan_reduction": 1 }))
     }
 }
 
 pub struct ChongZhengSkill;
 
 impl Skill for ChongZhengSkill {
-    fn id(&self) -> u32 { 7 }
-    fn name(&self) -> &str { "重整" }
-    fn description(&self) -> &str { "重排手牌显示顺序" }
-    fn category(&self) -> SkillCategory { SkillCategory::ErrorCorrection }
-    fn max_uses(&self) -> u8 { 10 }
-    
+    fn id(&self) -> u32 {
+        7
+    }
+    fn name(&self) -> &str {
+        "重整"
+    }
+    fn description(&self) -> &str {
+        "重排手牌显示顺序"
+    }
+    fn category(&self) -> SkillCategory {
+        SkillCategory::ErrorCorrection
+    }
+    fn max_uses(&self) -> u8 {
+        10
+    }
+
     fn can_use(&self, game_state: &GameState, player_id: PlayerId) -> bool {
         game_state.hands.contains_key(&player_id)
     }
-    
-    fn use_skill(&mut self, game_state: &mut GameState, player_id: PlayerId, _target: Option<PlayerId>) -> SkillResult {
+
+    fn use_skill(
+        &mut self,
+        game_state: &mut GameState,
+        player_id: PlayerId,
+        _target: Option<PlayerId>,
+    ) -> SkillResult {
         if let Some(hand) = game_state.hands.get_mut(&player_id) {
             hand.sort();
             SkillResult::success("手牌已重新排序")
@@ -163,17 +267,32 @@ impl Skill for ChongZhengSkill {
 pub struct WenDouSkill;
 
 impl Skill for WenDouSkill {
-    fn id(&self) -> u32 { 8 }
-    fn name(&self) -> &str { "稳豆" }
-    fn description(&self) -> &str { "本局失败时欢乐豆损失减少5%" }
-    fn category(&self) -> SkillCategory { SkillCategory::Economy }
-    fn max_uses(&self) -> u8 { 1 }
-    
+    fn id(&self) -> u32 {
+        8
+    }
+    fn name(&self) -> &str {
+        "稳豆"
+    }
+    fn description(&self) -> &str {
+        "本局失败时欢乐豆损失减少5%"
+    }
+    fn category(&self) -> SkillCategory {
+        SkillCategory::Economy
+    }
+    fn max_uses(&self) -> u8 {
+        1
+    }
+
     fn can_use(&self, _game_state: &GameState, _player_id: PlayerId) -> bool {
         true
     }
-    
-    fn use_skill(&mut self, _game_state: &mut GameState, _player_id: PlayerId, _target: Option<PlayerId>) -> SkillResult {
+
+    fn use_skill(
+        &mut self,
+        _game_state: &mut GameState,
+        _player_id: PlayerId,
+        _target: Option<PlayerId>,
+    ) -> SkillResult {
         SkillResult::success("稳豆效果已激活")
             .with_data(serde_json::json!({ "loss_reduction": 0.05 }))
     }
@@ -182,36 +301,65 @@ impl Skill for WenDouSkill {
 pub struct JiaMaSkill;
 
 impl Skill for JiaMaSkill {
-    fn id(&self) -> u32 { 9 }
-    fn name(&self) -> &str { "加码" }
-    fn description(&self) -> &str { "胡牌时额外获得3%欢乐豆" }
-    fn category(&self) -> SkillCategory { SkillCategory::Economy }
-    fn max_uses(&self) -> u8 { 1 }
-    
+    fn id(&self) -> u32 {
+        9
+    }
+    fn name(&self) -> &str {
+        "加码"
+    }
+    fn description(&self) -> &str {
+        "胡牌时额外获得3%欢乐豆"
+    }
+    fn category(&self) -> SkillCategory {
+        SkillCategory::Economy
+    }
+    fn max_uses(&self) -> u8 {
+        1
+    }
+
     fn can_use(&self, _game_state: &GameState, _player_id: PlayerId) -> bool {
         true
     }
-    
-    fn use_skill(&mut self, _game_state: &mut GameState, _player_id: PlayerId, _target: Option<PlayerId>) -> SkillResult {
-        SkillResult::success("加码效果已激活")
-            .with_data(serde_json::json!({ "win_bonus": 0.03 }))
+
+    fn use_skill(
+        &mut self,
+        _game_state: &mut GameState,
+        _player_id: PlayerId,
+        _target: Option<PlayerId>,
+    ) -> SkillResult {
+        SkillResult::success("加码效果已激活").with_data(serde_json::json!({ "win_bonus": 0.03 }))
     }
 }
 
 pub struct TiSuSkill;
 
 impl Skill for TiSuSkill {
-    fn id(&self) -> u32 { 10 }
-    fn name(&self) -> &str { "提速" }
-    fn description(&self) -> &str { "胡牌≥6番时返还2%欢乐豆" }
-    fn category(&self) -> SkillCategory { SkillCategory::Economy }
-    fn max_uses(&self) -> u8 { 1 }
-    
+    fn id(&self) -> u32 {
+        10
+    }
+    fn name(&self) -> &str {
+        "提速"
+    }
+    fn description(&self) -> &str {
+        "胡牌≥6番时返还2%欢乐豆"
+    }
+    fn category(&self) -> SkillCategory {
+        SkillCategory::Economy
+    }
+    fn max_uses(&self) -> u8 {
+        1
+    }
+
     fn can_use(&self, _game_state: &GameState, _player_id: PlayerId) -> bool {
         true
     }
-    
-    fn use_skill(&mut self, _game_state: &mut GameState, _player_id: PlayerId, _target: Option<PlayerId>) -> SkillResult {
+
+    fn use_skill(
+        &mut self,
+        _game_state: &mut GameState,
+        _player_id: PlayerId,
+        _target: Option<PlayerId>,
+    ) -> SkillResult {
         SkillResult::success("提速效果已激活")
             .with_data(serde_json::json!({ "fan_threshold": 6, "bonus": 0.02 }))
     }
@@ -228,17 +376,32 @@ impl GuZhuSkill {
 }
 
 impl Skill for GuZhuSkill {
-    fn id(&self) -> u32 { 11 }
-    fn name(&self) -> &str { "孤注" }
-    fn description(&self) -> &str { "听牌后宣告，胡牌+6%豆，失败-6%" }
-    fn category(&self) -> SkillCategory { SkillCategory::Risk }
-    fn max_uses(&self) -> u8 { 1 }
-    
+    fn id(&self) -> u32 {
+        11
+    }
+    fn name(&self) -> &str {
+        "孤注"
+    }
+    fn description(&self) -> &str {
+        "听牌后宣告，胡牌+6%豆，失败-6%"
+    }
+    fn category(&self) -> SkillCategory {
+        SkillCategory::Risk
+    }
+    fn max_uses(&self) -> u8 {
+        1
+    }
+
     fn can_use(&self, game_state: &GameState, player_id: PlayerId) -> bool {
         !self.active && game_state.can_hu(player_id).unwrap_or(false)
     }
-    
-    fn use_skill(&mut self, _game_state: &mut GameState, _player_id: PlayerId, _target: Option<PlayerId>) -> SkillResult {
+
+    fn use_skill(
+        &mut self,
+        _game_state: &mut GameState,
+        _player_id: PlayerId,
+        _target: Option<PlayerId>,
+    ) -> SkillResult {
         self.active = true;
         SkillResult::success("孤注一掷！胡牌+6%豆，失败-6%")
             .with_data(serde_json::json!({ "win_bonus": 0.06, "loss_penalty": 0.06 }))
@@ -248,17 +411,32 @@ impl Skill for GuZhuSkill {
 pub struct FanYaSkill;
 
 impl Skill for FanYaSkill {
-    fn id(&self) -> u32 { 12 }
-    fn name(&self) -> &str { "反压" }
-    fn description(&self) -> &str { "指定对手：对方失败-5%豆，你失败-5%" }
-    fn category(&self) -> SkillCategory { SkillCategory::Risk }
-    fn max_uses(&self) -> u8 { 1 }
-    
+    fn id(&self) -> u32 {
+        12
+    }
+    fn name(&self) -> &str {
+        "反压"
+    }
+    fn description(&self) -> &str {
+        "指定对手：对方失败-5%豆，你失败-5%"
+    }
+    fn category(&self) -> SkillCategory {
+        SkillCategory::Risk
+    }
+    fn max_uses(&self) -> u8 {
+        1
+    }
+
     fn can_use(&self, _game_state: &GameState, _player_id: PlayerId) -> bool {
         true
     }
-    
-    fn use_skill(&mut self, _game_state: &mut GameState, _player_id: PlayerId, target: Option<PlayerId>) -> SkillResult {
+
+    fn use_skill(
+        &mut self,
+        _game_state: &mut GameState,
+        _player_id: PlayerId,
+        target: Option<PlayerId>,
+    ) -> SkillResult {
         if let Some(target_id) = target {
             SkillResult::success(format!("已对玩家 {:?} 施加反压", target_id))
                 .with_data(serde_json::json!({ "target": target_id, "penalty": 0.05 }))
@@ -300,5 +478,99 @@ pub fn get_skill_by_id(id: u32) -> Option<Box<dyn Skill>> {
         11 => Some(Box::new(GuZhuSkill::new())),
         12 => Some(Box::new(FanYaSkill)),
         _ => None,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use guilin_paizi_core::{GamePhase, GameState, Player};
+
+    fn create_test_game() -> GameState {
+        let mut game = GameState::new();
+        game.phase = GamePhase::Playing;
+        game.add_player(Player::new("玩家1")).unwrap();
+        game.add_player(Player::new("玩家2")).unwrap();
+        game.start_game().unwrap();
+        game
+    }
+
+    #[test]
+    fn test_tingshi_skill() {
+        let skill = TingShiSkill;
+        assert_eq!(skill.id(), 1);
+        assert_eq!(skill.name(), "听势");
+        assert_eq!(skill.category(), SkillCategory::Information);
+        assert_eq!(skill.max_uses(), 2);
+    }
+
+    #[test]
+    fn test_guanliu_skill() {
+        let mut game = create_test_game();
+        let player_id = game.players[0].id;
+
+        // Add a card to discard pile for the test
+        if let Some(hand) = game.hands.get_mut(&player_id) {
+            if let Some(card) = hand.remove_card(0) {
+                game.discard_pile.push((player_id, card));
+            }
+        }
+
+        let mut skill = GuanLiuSkill;
+        assert!(skill.can_use(&game, player_id));
+
+        let result = skill.use_skill(&mut game, player_id, None);
+        assert!(result.success);
+    }
+
+    #[test]
+    fn test_wenshou_skill() {
+        let mut skill = WenShouSkill::new();
+        let mut game = create_test_game();
+        let player_id = game.players[0].id;
+
+        assert!(!skill.can_use(&game, player_id));
+
+        skill.undo_available = true;
+        assert!(skill.can_use(&game, player_id));
+
+        let result = skill.use_skill(&mut game, player_id, None);
+        assert!(result.success);
+    }
+
+    #[test]
+    fn test_guzhu_skill() {
+        let skill = GuZhuSkill::new();
+        let game = create_test_game();
+        let player_id = game.players[0].id;
+
+        assert!(!skill.can_use(&game, player_id));
+    }
+
+    #[test]
+    fn test_fanya_skill() {
+        let mut skill = FanYaSkill;
+        let mut game = create_test_game();
+        let player_id = game.players[0].id;
+        let target = game.players[1].id;
+
+        let result = skill.use_skill(&mut game, player_id, Some(target));
+        assert!(result.success);
+
+        let result2 = skill.use_skill(&mut game, player_id, None);
+        assert!(!result2.success);
+    }
+
+    #[test]
+    fn test_create_all_skills() {
+        let skills = create_all_skills();
+        assert_eq!(skills.len(), 12);
+    }
+
+    #[test]
+    fn test_get_skill_by_id() {
+        assert!(get_skill_by_id(1).is_some());
+        assert!(get_skill_by_id(12).is_some());
+        assert!(get_skill_by_id(99).is_none());
     }
 }

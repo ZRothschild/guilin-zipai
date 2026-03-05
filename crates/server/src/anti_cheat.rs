@@ -1,4 +1,4 @@
-use guilin_paizi_core::{PlayerId, GameState, GameAction};
+use guilin_paizi_core::{GameAction, GameState, PlayerId};
 use std::collections::{HashMap, VecDeque};
 
 pub struct AntiCheatSystem {
@@ -31,15 +31,23 @@ impl AntiCheatSystem {
     }
 
     pub fn record_action(&mut self, player_id: PlayerId, action: GameAction) {
-        let history = self.action_history.entry(player_id).or_insert_with(|| VecDeque::with_capacity(100));
+        let history = self
+            .action_history
+            .entry(player_id)
+            .or_insert_with(|| VecDeque::with_capacity(100));
         history.push_back(action);
-        
+
         if history.len() > 100 {
             history.pop_front();
         }
     }
 
-    pub fn validate_action(&self, game_state: &GameState, player_id: PlayerId, action: &GameAction) -> ValidationResult {
+    pub fn validate_action(
+        &self,
+        game_state: &GameState,
+        player_id: PlayerId,
+        action: &GameAction,
+    ) -> ValidationResult {
         if let Some(current) = game_state.get_current_player_id() {
             if current != player_id {
                 return ValidationResult::Invalid("不是当前玩家的回合".to_string());
@@ -60,16 +68,18 @@ impl AntiCheatSystem {
         ValidationResult::Valid
     }
 
-    pub fn check_patterns(&mut self, player_id: PlayerId, _game_state: &GameState) -> Vec<SuspiciousPattern> {
+    pub fn check_patterns(
+        &mut self,
+        player_id: PlayerId,
+        _game_state: &GameState,
+    ) -> Vec<SuspiciousPattern> {
         let mut detected = Vec::new();
 
         if let Some(history) = self.action_history.get(&player_id) {
             if history.len() >= 10 {
                 let recent_actions: Vec<_> = history.iter().rev().take(10).collect();
-                
-                let all_same_timing = recent_actions.windows(2).all(|w| {
-                    true
-                });
+
+                let all_same_timing = recent_actions.windows(2).all(|_w| true);
 
                 if all_same_timing && history.len() >= 20 {
                     detected.push(SuspiciousPattern {
@@ -90,7 +100,9 @@ impl AntiCheatSystem {
     }
 
     pub fn get_suspicious_players(&self) -> Vec<PlayerId> {
-        let mut players: Vec<_> = self.suspicious_patterns.iter()
+        let mut players: Vec<_> = self
+            .suspicious_patterns
+            .iter()
             .map(|p| p.player_id)
             .collect();
         players.dedup();

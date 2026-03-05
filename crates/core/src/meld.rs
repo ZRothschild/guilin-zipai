@@ -1,10 +1,11 @@
-use crate::card::{Card, CardValue, Suit};
+use crate::card::{Card, Suit};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum MeldType {
     Chi,
     Peng,
+    SanDa,
     Sao,
     SaoChuan,
     KaiDuo,
@@ -26,6 +27,15 @@ impl MeldType {
                     6
                 } else {
                     3
+                }
+            }
+            // 大小三搭：2大1小 or 2小1大
+            MeldType::SanDa => {
+                // 大字占多 = is_big dominant
+                if is_big {
+                    5 // 2大1小 稍高
+                } else {
+                    4 // 2小1大
                 }
             }
             MeldType::Sao => {
@@ -60,7 +70,7 @@ impl MeldType {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Meld {
     pub meld_type: MeldType,
     pub cards: Vec<Card>,
@@ -77,7 +87,13 @@ impl Meld {
     }
 
     pub fn huxi(&self) -> u8 {
-        let is_big = self.cards.iter().any(|c| c.suit == Suit::Big);
+        let big_count = self.cards.iter().filter(|c| c.suit == Suit::Big).count();
+        // For SanDa: "is_big" means big-dominant (2 big cards)
+        let is_big = if self.meld_type == MeldType::SanDa {
+            big_count >= 2
+        } else {
+            self.cards.iter().any(|c| c.suit == Suit::Big)
+        };
         self.meld_type.base_huxi(is_big)
     }
 
@@ -128,18 +144,18 @@ impl Meld {
         if cards.len() != 3 {
             return false;
         }
-        cards.iter().all(|c| {
-            c.suit == cards[0].suit && c.value == cards[0].value
-        })
+        cards
+            .iter()
+            .all(|c| c.suit == cards[0].suit && c.value == cards[0].value)
     }
 
     pub fn is_valid_kan(cards: &[Card]) -> bool {
         if cards.len() != 3 {
             return false;
         }
-        cards.iter().all(|c| {
-            c.suit == cards[0].suit && c.value == cards[0].value
-        })
+        cards
+            .iter()
+            .all(|c| c.suit == cards[0].suit && c.value == cards[0].value)
     }
 
     pub fn is_valid_sao(self_cards: &[Card], new_card: &Card) -> bool {
@@ -153,6 +169,7 @@ impl Meld {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::CardValue;
 
     #[test]
     fn test_valid_chi() {

@@ -1,5 +1,4 @@
 use guilin_paizi_core::PlayerId;
-use std::collections::HashMap;
 
 #[derive(Debug, Clone, Default)]
 pub struct AppState {
