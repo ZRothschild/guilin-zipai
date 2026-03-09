@@ -549,11 +549,10 @@ impl GameState {
             .get(&player_id)
             .ok_or(GameError::PlayerNotFound)?;
 
-        let mut total_huxi = 0u8;
-
-        for meld in hand.melds() {
-            total_huxi = total_huxi.saturating_add(meld.huxi());
-        }
+        let total_huxi = hand.total_huxi();
+        
+        // 如果 Player struct 中也有 exposed_melds (未来可能合并)，这里也应该计算
+        // 目前大部分逻辑在 GameState.hands 的 melds 中
 
         Ok(total_huxi)
     }
@@ -716,18 +715,18 @@ mod tests {
         hand.add_meld(Meld::new(
             MeldType::Chi,
             vec![
-                Card::new(Suit::Big, CardValue::Four),
-                Card::new(Suit::Big, CardValue::Five),
-                Card::new(Suit::Big, CardValue::Six),
+                Card::new(Suit::Big, CardValue::Two),
+                Card::new(Suit::Big, CardValue::Seven),
+                Card::new(Suit::Big, CardValue::Ten),
             ],
             false,
         ));
         hand.add_meld(Meld::new(
             MeldType::Chi,
             vec![
-                Card::new(Suit::Big, CardValue::Seven),
-                Card::new(Suit::Big, CardValue::Eight),
-                Card::new(Suit::Big, CardValue::Nine),
+                Card::new(Suit::Small, CardValue::One),
+                Card::new(Suit::Small, CardValue::Two),
+                Card::new(Suit::Small, CardValue::Three),
             ],
             false,
         ));
@@ -835,15 +834,15 @@ mod tests {
         hand.add_meld(Meld::new(
             MeldType::Sao,
             vec![
-                Card::new(Suit::Small, CardValue::Seven),
-                Card::new(Suit::Small, CardValue::Seven),
-                Card::new(Suit::Small, CardValue::Seven),
+                Card::new(Suit::Big, CardValue::Seven),
+                Card::new(Suit::Big, CardValue::Seven),
+                Card::new(Suit::Big, CardValue::Seven),
             ],
             false,
         ));
 
         let huxi = game.calculate_hand_huxi(player_id).unwrap();
-        assert!(huxi >= 10);
+        assert!(huxi >= 10, "期望胡息 >= 10, 实际为 {}", huxi);
         assert!(game.can_hu(player_id).unwrap());
     }
 

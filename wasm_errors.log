@@ -1,0 +1,69 @@
+    Checking guilin-paizi-client v0.1.0 (D:\rustWork\guilin-zipai\crates\client)
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `log`
+  --> crates\client\src\main.rs:47:13
+   |
+47 |             log::info!("Attempting to connect to WebSocket at ws://127.0.0.1:8080");
+   |             ^^^ use of unresolved module or unlinked crate `log`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `log`
+  --> crates\client\src\main.rs:49:17
+   |
+49 |                 log::info!("Received message: {}", msg);
+   |                 ^^^ use of unresolved module or unlinked crate `log`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `log`
+  --> crates\client\src\main.rs:53:29
+   |
+53 | ...                   log::info!("Welcome message received");
+   |                       ^^^ use of unresolved module or unlinked crate `log`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `log`
+  --> crates\client\src\main.rs:60:33
+   |
+60 | ...                   log::info!("Room joined: {}", room_id);
+   |                       ^^^ use of unresolved module or unlinked crate `log`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `log`
+  --> crates\client\src\main.rs:68:41
+   |
+68 | ...                   log::info!("Room info updated: {} players", room_info.players.len());
+   |                       ^^^ use of unresolved module or unlinked crate `log`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `log`
+  --> crates\client\src\main.rs:71:47
+   |
+71 | ...                   Err(e) => log::error!("Failed to deserialize RoomInfo: {:?}", e),
+   |                                 ^^^ use of unresolved module or unlinked crate `log`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `log`
+  --> crates\client\src\main.rs:79:41
+   |
+79 | ...                   log::info!("Game state updated: phase {:?}", gs.phase);
+   |                       ^^^ use of unresolved module or unlinked crate `log`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `log`
+  --> crates\client\src\main.rs:82:47
+   |
+82 | ...                   Err(e) => log::error!("Failed to deserialize GameState: {:?}", e),
+   |                                 ^^^ use of unresolved module or unlinked crate `log`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `log`
+  --> crates\client\src\main.rs:87:29
+   |
+87 | ...                   log::info!("Game started!");
+   |                       ^^^ use of unresolved module or unlinked crate `log`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `log`
+  --> crates\client\src\main.rs:90:30
+   |
+90 |                         _ => log::warn!("Unknown message type: {:?}", value["type"]),
+   |                              ^^^ use of unresolved module or unlinked crate `log`
+
+error[E0433]: failed to resolve: use of unresolved module or unlinked crate `log`
+  --> crates\client\src\main.rs:93:21
+   |
+93 |                     log::error!("Failed to parse message as JSON: {}", msg);
+   |                     ^^^ use of unresolved module or unlinked crate `log`
+
+For more information about this error, try `rustc --explain E0433`.
+error: could not compile `guilin-paizi-client` (bin "guilin-paizi-client") due to 11 previous errors

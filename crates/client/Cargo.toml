@@ -9,7 +9,6 @@ description = "桂林字牌客户端（Yew + WASM）"
 
 [dependencies]
 guilin-paizi-core = { path = "../core" }
-
 serde.workspace = true
 serde_json.workspace = true
 yew.workspace = true
@@ -19,7 +18,6 @@ wasm-bindgen-futures.workspace = true
 gloo.workspace = true
 uuid = { version = "1.6", features = ["v4", "js"] }
 chrono.workspace = true
-
 web-sys = { version = "0.3", features = [
   "console",
   "Document",
@@ -36,8 +34,12 @@ web-sys = { version = "0.3", features = [
   "CloseEvent",
   "ErrorEvent",
 ] }
-
 wasm-logger = "0.2"
+log = "0.4"
 js-sys = "0.3"
 futures = "0.3"
 futures-util = "0.3"
+
+[[bin]]
+name = "guilin-paizi-client"
+path = "src/main.rs"

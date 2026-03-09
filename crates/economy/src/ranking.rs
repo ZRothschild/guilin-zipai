@@ -194,6 +194,33 @@ impl RankingSystem {
         self.player_ratings.get(&player_id)
     }
 
+    pub fn update_rating(&mut self, player_id: PlayerId, change: i32) {
+        if let Some(rating) = self.player_ratings.get_mut(&player_id) {
+            let new_rating = (rating.rating as i32 + change).max(0) as u32;
+            rating.rating = new_rating;
+            rating.games_played += 1;
+            if change > 0 {
+                rating.wins += 1;
+            } else {
+                rating.losses += 1;
+            }
+        }
+    }
+
+    pub fn update_rank(&mut self, player_id: PlayerId, stars: i8) {
+        if let Some(rank) = self.player_ranks.get_mut(&player_id) {
+            if stars > 0 {
+                for _ in 0..stars {
+                    rank.add_star();
+                }
+            } else if stars < 0 {
+                for _ in 0..stars.abs() {
+                    rank.demote();
+                }
+            }
+        }
+    }
+
     pub fn update_after_match(&mut self, winner: PlayerId, loser: PlayerId) {
         let winner_rating = self.player_ratings.get(&winner).map(|r| r.rating).unwrap_or(1000);
         let loser_rating = self.player_ratings.get(&loser).map(|r| r.rating).unwrap_or(1000);
@@ -206,13 +233,8 @@ impl RankingSystem {
             rating.update_rating(winner_rating, false);
         }
 
-        if let Some(rank) = self.player_ranks.get_mut(&winner) {
-            rank.add_star();
-        }
-
-        if let Some(rank) = self.player_ranks.get_mut(&loser) {
-            rank.demote();
-        }
+        self.update_rank(winner, 1);
+        self.update_rank(loser, -1);
     }
 }
 

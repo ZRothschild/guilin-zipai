@@ -14,6 +14,8 @@ pub trait Skill: Send + Sync {
     fn description(&self) -> &str;
     fn category(&self) -> SkillCategory;
     fn max_uses(&self) -> u8;
+    fn sp_cost(&self) -> u32 { 0 }
+    fn cooldown(&self) -> u32 { 0 }
     fn can_use(&self, game_state: &GameState, player_id: PlayerId) -> bool;
     fn use_skill(
         &mut self,
@@ -75,6 +77,7 @@ impl SkillResult {
 pub struct SkillInstance {
     pub skill: Box<dyn Skill>,
     pub remaining_uses: u8,
+    pub current_cooldown: u32,
 }
 
 impl SkillInstance {
@@ -83,6 +86,7 @@ impl SkillInstance {
         Self {
             skill,
             remaining_uses: uses,
+            current_cooldown: 0,
         }
     }
 
@@ -96,6 +100,17 @@ impl SkillInstance {
             return SkillResult::failure("技能使用次数已耗尽");
         }
 
+        if self.current_cooldown > 0 {
+            return SkillResult::failure(format!("技能冷却中，剩余 {} 回合", self.current_cooldown));
+        }
+
+        // 查找玩家 SP
+        let player_sp = game_state.players.iter().find(|p| p.id == player_id).map(|p| p.sp).unwrap_or(0);
+        let cost = self.skill.sp_cost();
+        if player_sp < cost {
+            return SkillResult::failure("SP不足");
+        }
+
         if !self.skill.can_use(game_state, player_id) {
             return SkillResult::failure("当前无法使用该技能");
         }
@@ -104,9 +119,21 @@ impl SkillInstance {
 
         if result.success {
             self.remaining_uses -= 1;
+            self.current_cooldown = self.skill.cooldown();
+            
+            // 消耗玩家 SP
+            if let Some(player) = game_state.players.iter_mut().find(|p| p.id == player_id) {
+                player.consume_sp(cost);
+            }
         }
 
         result
+    }
+
+    pub fn update_cooldown(&mut self) {
+        if self.current_cooldown > 0 {
+            self.current_cooldown -= 1;
+        }
     }
 }
 
@@ -150,6 +177,14 @@ impl SkillManager {
             }
         }
         None
+    }
+
+    pub fn update_all_cooldowns(&mut self) {
+        for skills in self.player_skills.values_mut() {
+            for skill in skills {
+                skill.update_cooldown();
+            }
+        }
     }
 }
 

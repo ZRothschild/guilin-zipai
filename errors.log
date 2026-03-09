@@ -1,0 +1,94 @@
+warning: D:\rustWork\guilin-zipai\crates\client\Cargo.toml: unused manifest key: bin.0.chrono
+warning: D:\rustWork\guilin-zipai\crates\client\Cargo.toml: unused manifest key: bin.0.futures
+warning: D:\rustWork\guilin-zipai\crates\client\Cargo.toml: unused manifest key: bin.0.futures-util
+warning: D:\rustWork\guilin-zipai\crates\client\Cargo.toml: unused manifest key: bin.0.gloo
+warning: D:\rustWork\guilin-zipai\crates\client\Cargo.toml: unused manifest key: bin.0.js-sys
+warning: D:\rustWork\guilin-zipai\crates\client\Cargo.toml: unused manifest key: bin.0.serde
+warning: D:\rustWork\guilin-zipai\crates\client\Cargo.toml: unused manifest key: bin.0.serde_json
+warning: D:\rustWork\guilin-zipai\crates\client\Cargo.toml: unused manifest key: bin.0.uuid
+warning: D:\rustWork\guilin-zipai\crates\client\Cargo.toml: unused manifest key: bin.0.wasm-bindgen
+warning: D:\rustWork\guilin-zipai\crates\client\Cargo.toml: unused manifest key: bin.0.wasm-bindgen-futures
+warning: D:\rustWork\guilin-zipai\crates\client\Cargo.toml: unused manifest key: bin.0.wasm-logger
+warning: D:\rustWork\guilin-zipai\crates\client\Cargo.toml: unused manifest key: bin.0.web-sys
+warning: D:\rustWork\guilin-zipai\crates\client\Cargo.toml: unused manifest key: bin.0.yew
+warning: D:\rustWork\guilin-zipai\crates\client\Cargo.toml: unused manifest key: bin.0.yew-router
+warning: variable does not need to be mutable
+   --> crates\core\src\game.rs:552:13
+    |
+552 | ...   let mut total_huxi = hand.total_hux...
+    |           ----^^^^^^^^^^
+    |           |
+    |           help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` on by default
+
+warning: `guilin-paizi-core` (lib) generated 1 warning (run `cargo fix --lib -p guilin-paizi-core` to apply 1 suggestion)
+warning: unused variable: `player_id`
+  --> crates\skills\src\effect.rs:81:9
+   |
+81 |         player_id: PlayerId,
+   |         ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_player_id`
+   |
+   = note: `#[warn(unused_variables)]` on by default
+
+warning: `guilin-paizi-skills` (lib) generated 1 warning
+warning: field `config` is never read
+  --> crates\economy\src\settlement.rs:46:5
+   |
+45 | pub struct SettlementCalculator {
+   |            -------------------- field in this struct
+46 |     config: EconomyConfig,
+   |     ^^^^^^
+   |
+   = note: `#[warn(dead_code)]` on by default
+
+warning: `guilin-paizi-economy` (lib) generated 1 warning
+    Checking guilin-paizi-server v0.1.0 (D:\rustWork\guilin-zipai\crates\server)
+warning: unused import: `Player`
+ --> crates\server\src\handler.rs:3:35
+  |
+3 | use guilin_paizi_core::{PlayerId, Player, GamePhase};
+  |                                   ^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unused imports: `Card` and `GameState`
+ --> crates\server\src\bot.rs:1:35
+  |
+1 | use guilin_paizi_core::{PlayerId, Card, GameState, GamePhase};
+  |                                   ^^^^  ^^^^^^^^^
+
+warning: unused import: `rand::seq::SliceRandom`
+ --> crates\server\src\bot.rs:4:5
+  |
+4 | use rand::seq::SliceRandom;
+  |     ^^^^^^^^^^^^^^^^^^^^^^
+
+error: future cannot be sent between threads safely
+   --> crates\server\src\server.rs:572:17
+    |
+572 | /                 tokio::spawn(async move {
+573 | |                     // 模拟思考时间
+574 | |                     tokio::time::sleep(std::time::Duration::from_millis(800)).await;
+...   |
+584 | |                     ).await;
+585 | |                 });
+    | |__________________^ future created by async block is not `Send`
+    |
+    = note: cannot satisfy `impl futures::Future<Output = ()>: std::marker::Send`
+note: future is not `Send` as it awaits another future which is not `Send`
+   --> crates\server\src\server.rs:299:21
+    |
+299 | ...   trigger_bot_actions(room_id.clone(), rooms.clone(), connections.clone(), player_rooms.clone(), handler.clone(), economy.clone()).aw...
+    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ await occurs here on type `impl futures::Future<Output = ()>`, which is not `Send`
+note: required by a bound in `tokio::spawn`
+   --> C:\Users\gientech\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\tokio-1.50.0\src\task\spawn.rs:176:21
+    |
+174 |     pub fn spawn<F>(future: F) -> JoinHandle<F::Output>
+    |            ----- required by a bound in this function
+175 |     where
+176 |         F: Future + Send + 'static,
+    |                     ^^^^ required by this bound in `spawn`
+
+warning: `guilin-paizi-server` (lib) generated 3 warnings
+error: could not compile `guilin-paizi-server` (lib) due to 1 previous error; 3 warnings emitted

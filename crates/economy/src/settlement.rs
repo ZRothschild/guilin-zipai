@@ -43,6 +43,7 @@ pub struct SettlementResult {
 }
 
 pub struct SettlementCalculator {
+    #[allow(dead_code)]
     config: EconomyConfig,
 }
 

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>桂林字牌</title>
+    <link rel="stylesheet" href="/style-56d5b9a7ceb9b8e9.css" integrity="sha384-n3ffyBPJrxYXgyT1JS3azfsqHyPfYjx8mzqZ3PRQcJCC1V5398MMSb8hZMhAbcJX"/>
+    
+<script type="module">
+import init, * as bindings from '/guilin-paizi-client-9d85f370f9bddbb0.js';
+const wasm = await init({ module_or_path: '/guilin-paizi-client-9d85f370f9bddbb0_bg.wasm' });
+
+
+window.wasmBindings = bindings;
+
+
+dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
+
+</script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+<link rel="modulepreload" href="/guilin-paizi-client-9d85f370f9bddbb0.js" crossorigin="anonymous" integrity="sha384-xO2oDyxIRSUFlp9q4PAPBVGR2yImChp38qImBZ1lKKJ2osCb//VRQTOG0Qo0u9NC"><link rel="preload" href="/guilin-paizi-client-9d85f370f9bddbb0_bg.wasm" crossorigin="anonymous" integrity="sha384-a7hqdJiKQPY0PRexHJ33wr62yhakB5UZGjHR/oigN5b5ATQLeZlVas9hHhLhddcP" as="fetch" type="application/wasm"></head>
+<body></body>
+</html>

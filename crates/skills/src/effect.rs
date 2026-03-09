@@ -78,7 +78,7 @@ impl EffectHandler for StandardEffectHandler {
         &self,
         effect: &SkillEffect,
         game_state: &mut GameState,
-        player_id: PlayerId,
+        _player_id: PlayerId,
     ) -> EffectResult {
         match effect {
             SkillEffect::RevealInformation(info_type) => match info_type {

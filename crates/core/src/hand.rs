@@ -92,6 +92,15 @@ impl Hand {
         let counts = self.get_card_counts();
         counts.get(card).copied().unwrap_or(0) >= 2
     }
+
+    pub fn total_huxi(&self) -> u8 {
+        self.melds.iter().map(|m| m.huxi()).sum()
+    }
+
+    pub fn can_hu(&self) -> bool {
+        // 基本规则：手牌除了最后一张胡的牌外应该都能组成牌组
+        self.cards.is_empty()
+    }
 }
 
 #[cfg(test)]

@@ -30,6 +30,7 @@ pub struct PlayerInfo {
     pub is_ready: bool,
     pub hand_count: usize,
     pub is_online: bool,
+    pub is_bot: bool,
 }
 
 pub struct GameRoom {
@@ -73,6 +74,19 @@ impl GameRoom {
         true
     }
 
+    pub fn add_bot(&mut self) -> Option<PlayerId> {
+        if self.players.len() >= self.max_players {
+            return None;
+        }
+
+        let bot_id = PlayerId::new();
+        let mut bot = Player::new_bot(format!("机器人{}", self.players.len() + 1));
+        bot.id = bot_id;
+        self.players.push(bot);
+        self.ready_players.push(bot_id);
+        Some(bot_id)
+    }
+
     pub fn remove_player(&mut self, player_id: PlayerId) -> bool {
         let len_before = self.players.len();
         self.players.retain(|p| p.id != player_id);
@@ -107,6 +121,10 @@ impl GameRoom {
     }
 
     pub fn start_game(&mut self) {
+        if self.state == RoomState::Playing {
+            return;
+        }
+
         for player in &self.players {
             let _ = self.game_state.add_player(player.clone());
         }
@@ -239,7 +257,8 @@ impl GameRoom {
                     name: p.name.clone(),
                     is_ready: self.ready_players.contains(&p.id),
                     hand_count: self.get_player_hand_count(p.id),
-                    is_online: self.is_player_online(p.id),
+                    is_online: self.is_player_online(p.id) || p.is_bot,
+                    is_bot: p.is_bot,
                 })
                 .collect(),
             max_players: self.max_players,
@@ -271,5 +290,9 @@ impl GameRoom {
 
     pub fn is_full(&self) -> bool {
         self.players.len() >= self.max_players
+    }
+
+    pub fn get_bot_ids(&self) -> Vec<PlayerId> {
+        self.players.iter().filter(|p| p.is_bot).map(|p| p.id).collect()
     }
 }

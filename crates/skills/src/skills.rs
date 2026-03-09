@@ -19,6 +19,8 @@ impl Skill for TingShiSkill {
     fn max_uses(&self) -> u8 {
         2
     }
+    fn sp_cost(&self) -> u32 { 20 }
+    fn cooldown(&self) -> u32 { 3 }
 
     fn can_use(&self, game_state: &GameState, _player_id: PlayerId) -> bool {
         game_state.phase == GamePhase::Playing
@@ -55,6 +57,8 @@ impl Skill for GuanLiuSkill {
     fn max_uses(&self) -> u8 {
         3
     }
+    fn sp_cost(&self) -> u32 { 10 }
+    fn cooldown(&self) -> u32 { 2 }
 
     fn can_use(&self, game_state: &GameState, _player_id: PlayerId) -> bool {
         game_state.phase == GamePhase::Playing && !game_state.discard_pile.is_empty()
@@ -97,6 +101,8 @@ impl Skill for SuanYuSkill {
     fn max_uses(&self) -> u8 {
         2
     }
+    fn sp_cost(&self) -> u32 { 30 }
+    fn cooldown(&self) -> u32 { 5 }
 
     fn can_use(&self, game_state: &GameState, _player_id: PlayerId) -> bool {
         game_state.phase == GamePhase::Playing
@@ -132,6 +138,8 @@ impl Skill for MingSuanSkill {
     fn max_uses(&self) -> u8 {
         5
     }
+    fn sp_cost(&self) -> u32 { 15 }
+    fn cooldown(&self) -> u32 { 3 }
 
     fn can_use(&self, game_state: &GameState, _player_id: PlayerId) -> bool {
         game_state.phase == GamePhase::Playing
@@ -393,8 +401,11 @@ impl Skill for GuZhuSkill {
     }
 
     fn can_use(&self, game_state: &GameState, player_id: PlayerId) -> bool {
-        !self.active && game_state.can_hu(player_id).unwrap_or(false)
+        let player_sp = game_state.players.iter().find(|p| p.id == player_id).map(|p| p.sp).unwrap_or(0);
+        !self.active && game_state.can_hu(player_id).unwrap_or(false) && player_sp >= self.sp_cost()
     }
+    fn sp_cost(&self) -> u32 { 40 }
+    fn cooldown(&self) -> u32 { 8 }
 
     fn use_skill(
         &mut self,

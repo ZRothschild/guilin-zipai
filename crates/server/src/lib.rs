@@ -3,6 +3,7 @@ pub mod room;
 pub mod message;
 pub mod handler;
 pub mod anti_cheat;
+pub mod bot;
 
 pub use server::GameServer;
 pub use room::{GameRoom, RoomState};

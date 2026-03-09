@@ -5,8 +5,10 @@ use serde::{Deserialize, Serialize};
 #[serde(tag = "type")]
 pub enum ClientMessage {
     Authenticate { token: String },
+    CreateRoom { max_players: usize },
     JoinRoom { room_id: String },
     LeaveRoom { room_id: String },
+    AddBot { room_id: String },
     Ready { room_id: String },
     StartGame { room_id: String },
     PlayCard { room_id: String, card_idx: usize },
@@ -24,9 +26,11 @@ pub enum ClientMessage {
 pub enum ServerMessage {
     Welcome { player_id: PlayerId, message: String },
     Error { message: String },
+    RoomCreated { room_id: String },
     RoomJoined { room_id: String, player_id: PlayerId },
     RoomLeft { room_id: String },
-    PlayerJoined { player_id: PlayerId, name: String },
+    RoomDeleted { room_id: String },
+    PlayerJoined { player_id: PlayerId, name: String, is_bot: bool },
     PlayerLeft { player_id: PlayerId },
     PlayerReady { player_id: PlayerId },
     GameStarted { dealer: PlayerId },
@@ -36,6 +40,7 @@ pub enum ServerMessage {
     MeldFormed { player_id: PlayerId, meld: Meld },
     PlayerHu { player_id: PlayerId, is_zimo: bool },
     GameEnded { winner: Option<PlayerId> },
+    RoomUpdate { room_info: String },
     SkillUsed { player_id: PlayerId, skill_name: String, effect: serde_json::Value },
     BeanUpdate { balance: u64 },
     RankUpdate { tier: String, stars: u8 },

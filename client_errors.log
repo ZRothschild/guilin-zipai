@@ -1,0 +1,35 @@
+    Checking guilin-paizi-client v0.1.0 (D:\rustWork\guilin-zipai\crates\client)
+error: only one root html element is allowed (hint: you can wrap multiple html elements in a fragment `<></>`)
+  --> crates\client\src\pages\game.rs:97:9
+   |
+97 |         </div>
+   |         ^^^^^^
+
+warning: unused imports: `GameBoard` and `HandView`
+ --> crates\client\src\pages\game.rs:3:25
+  |
+3 | use crate::components::{GameBoard, HandView};
+  |                         ^^^^^^^^^  ^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+warning: unused import: `yew::platform::spawn_local`
+ --> crates\client\src\services\websocket.rs:1:5
+  |
+1 | use yew::platform::spawn_local;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `ErrorEvent`
+ --> crates\client\src\services\websocket.rs:2:40
+  |
+2 | use web_sys::{WebSocket, MessageEvent, ErrorEvent};
+  |                                        ^^^^^^^^^^
+
+warning: unused import: `crate::services::websocket::WsMessage`
+  --> crates\client\src\main.rs:14:5
+   |
+14 | use crate::services::websocket::WsMessage;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: `guilin-paizi-client` (bin "guilin-paizi-client") generated 4 warnings
+error: could not compile `guilin-paizi-client` (bin "guilin-paizi-client") due to 1 previous error; 4 warnings emitted

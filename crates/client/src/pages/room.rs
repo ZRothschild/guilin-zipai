@@ -1,6 +1,6 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
-use crate::Route;
+use crate::{Route, GameContext};
 
 #[derive(Properties, PartialEq)]
 pub struct RoomPageProps {
@@ -10,22 +10,78 @@ pub struct RoomPageProps {
 #[function_component(RoomPage)]
 pub fn room_page(props: &RoomPageProps) -> Html {
     let navigator = use_navigator().unwrap();
+    let context = use_context::<GameContext>().expect("No GameContext found");
     let room_id = props.room_id.clone();
 
     let start_game = {
-        let navigator = navigator.clone();
+        let send_message = context.send_message.clone();
         let room_id = room_id.clone();
         Callback::from(move |_| {
-            navigator.push(&Route::Game { id: room_id.clone() });
+            send_message.emit(serde_json::json!({
+                "type": "StartGame",
+                "room_id": room_id
+            }));
         })
     };
 
     let leave_room = {
+        let send_message = context.send_message.clone();
+        let room_id = room_id.clone();
         let navigator = navigator.clone();
         Callback::from(move |_| {
+            send_message.emit(serde_json::json!({
+                "type": "LeaveRoom",
+                "room_id": room_id
+            }));
             navigator.push(&Route::Home);
         })
     };
+
+    let set_ready = {
+        let send_message = context.send_message.clone();
+        let room_id = room_id.clone();
+        Callback::from(move |_| {
+            send_message.emit(serde_json::json!({
+                "type": "Ready",
+                "room_id": room_id
+            }));
+        })
+    };
+
+    let add_bot = {
+        let send_message = context.send_message.clone();
+        let room_id = room_id.clone();
+        Callback::from(move |_| {
+            send_message.emit(serde_json::json!({
+                "type": "AddBot",
+                "room_id": room_id
+            }));
+        })
+    };
+
+    let players_html = context.state.players.iter().map(|p| {
+        let is_me = context.state.local_player_id == Some(p.id);
+        html! {
+            <div class="player-slot">
+                <span class="player-name">
+                    {format!("{} {}", p.name, if is_me { "(你)" } else { "" })}
+                    {if p.is_bot { " [机器人]" } else { "" }}
+                </span>
+                <span class={if p.is_ready { "status ready" } else { "status waiting" }}>
+                    {if p.is_ready { "已准备" } else { "准备中" }}
+                </span>
+            </div>
+        }
+    }).collect::<Html>();
+
+    // 填充空白槽位
+    let empty_slots = (context.state.players.len()..3).map(|_| {
+        html! {
+            <div class="player-slot empty">
+                <span>{"等待加入..."}</span>
+            </div>
+        }
+    }).collect::<Html>();
 
     html! {
         <div class="room-page">
@@ -37,38 +93,24 @@ pub fn room_page(props: &RoomPageProps) -> Html {
             <div class="room-content">
                 <div class="players-list">
                     <h3>{"玩家列表"}</h3>
-                    <div class="player-slot">
-                        <span class="player-name">{"玩家1 (你)"}</span>
-                        <span class="status ready">{"已准备"}</span>
-                    </div>
-                    <div class="player-slot empty">
-                        <span>{"等待加入..."}</span>
-                    </div>
-                    <div class="player-slot empty">
-                        <span>{"等待加入..."}</span>
-                    </div>
+                    {players_html}
+                    {empty_slots}
                 </div>
                 
                 <div class="room-settings">
-                    <h3>{"房间设置"}</h3>
-                    <div class="setting">
-                        <label>{"底分:"}</label>
-                        <select>
-                            <option value="100">{"100"}</option>
-                            <option value="500">{"500"}</option>
-                            <option value="1000">{"1000"}</option>
-                        </select>
-                    </div>
-                    <div class="setting">
-                        <label>{"技能模式:"}</label>
-                        <input type="checkbox" checked={true} />
+                    <h3>{"功能区"}</h3>
+                    <button class="btn-secondary" onclick={add_bot}>{"邀请机器人"}</button>
+                    <div class="setting-info">
+                        <p>{"桂林字牌规则：满3人或2人以上准备可开始"}</p>
                     </div>
                 </div>
             </div>
             
             <div class="room-actions">
-                <button class="btn-ready">{"准备"}</button>
-                <button class="btn-start" onclick={start_game}>{"开始游戏"}</button>
+                <button class="btn-ready" onclick={set_ready}>{"准备"}</button>
+                <button class="btn-start" onclick={start_game} disabled={context.state.players.len() < 2}>
+                    {"开始游戏"}
+                </button>
             </div>
         </div>
     }

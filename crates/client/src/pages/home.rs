@@ -1,18 +1,33 @@
 use yew::prelude::*;
 use yew_router::prelude::*;
-use crate::Route;
+use crate::{Route, GameContext};
 
 #[function_component(HomePage)]
 pub fn home_page() -> Html {
     let navigator = use_navigator().unwrap();
+    let context = use_context::<GameContext>().expect("No GameContext found");
 
     let create_room = {
-        let navigator = navigator.clone();
+        let send_message = context.send_message.clone();
         Callback::from(move |_| {
-            let room_id = format!("room_{}", js_sys::Math::random());
-            navigator.push(&Route::Room { id: room_id });
+            send_message.emit(serde_json::json!({
+                "type": "CreateRoom",
+                "max_players": 3
+            }));
         })
     };
+
+    // 监听状态，当加入房间成功时自动跳转
+    {
+        let navigator = navigator.clone();
+        let current_room = context.state.current_room.clone();
+        use_effect_with(current_room, move |room| {
+            if let Some(id) = room {
+                navigator.push(&Route::Room { id: id.clone() });
+            }
+            move || {}
+        });
+    }
 
     html! {
         <div class="home-page">

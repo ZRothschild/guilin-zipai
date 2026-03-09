@@ -49,12 +49,54 @@ impl EconomySystem {
         }
     }
 
-    pub fn process_game_result(
+    pub fn process_and_apply_game_result(
         &mut self,
         game_state: &GameState,
         outcomes: Vec<GameOutcome>,
     ) -> Vec<SettlementResult> {
-        self.settlement.calculate_settlement(game_state, outcomes, &self.config)
+        let results = self.settlement.calculate_settlement(game_state, outcomes, &self.config);
+        
+        for result in &results {
+            // Apply currency change
+            if let Some(beans) = self.currency.get_beans_mut(result.player_id) {
+                if result.final_beans > 0 {
+                    beans.add(
+                        result.player_id, 
+                        result.final_beans as u64, 
+                        TransactionType::Win, 
+                        "游戏胜利结算"
+                    );
+                } else if result.final_beans < 0 {
+                    let amount = result.final_beans.abs() as u64;
+                    beans.deduct(
+                        result.player_id, 
+                        amount, 
+                        TransactionType::Loss, 
+                        "游戏失败结算"
+                    );
+                }
+            }
+
+            // Apply ranking change
+            self.ranking.update_rating(result.player_id, result.rating_change);
+            
+            // Apply rank (stars)
+            if result.outcome.is_winner {
+                self.ranking.update_rank(result.player_id, 1);
+            } else {
+                self.ranking.update_rank(result.player_id, -1);
+            }
+        }
+        
+        results
+    }
+
+    pub fn claim_daily_bonus(&mut self, player_id: guilin_paizi_core::PlayerId) -> Option<u64> {
+        self.currency.claim_daily_bonus(player_id)
+    }
+
+    pub fn claim_bankruptcy_aid(&mut self, player_id: guilin_paizi_core::PlayerId) -> Result<u64, String> {
+        self.currency.claim_bankruptcy_aid(player_id)
     }
 }
 

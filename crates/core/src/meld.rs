@@ -16,55 +16,19 @@ impl MeldType {
     pub fn base_huxi(&self, is_big: bool) -> u8 {
         match self {
             MeldType::Chi => {
-                if is_big {
-                    6
-                } else {
-                    3
-                }
+                if is_big { 6 } else { 3 }
             }
             MeldType::Peng => {
-                if is_big {
-                    6
-                } else {
-                    3
-                }
+                if is_big { 3 } else { 1 }
             }
-            // 大小三搭：2大1小 or 2小1大
             MeldType::SanDa => {
-                // 大字占多 = is_big dominant
-                if is_big {
-                    5 // 2大1小 稍高
-                } else {
-                    4 // 2小1大
-                }
+                if is_big { 5 } else { 4 }
             }
-            MeldType::Sao => {
-                if is_big {
-                    9
-                } else {
-                    6
-                }
+            MeldType::Sao | MeldType::Kan => {
+                if is_big { 6 } else { 3 }
             }
-            MeldType::SaoChuan => {
-                if is_big {
-                    12
-                } else {
-                    9
-                }
-            }
-            MeldType::KaiDuo => {
-                if is_big {
-                    9
-                } else {
-                    6
-                }
-            }
-            MeldType::Kan => {
-                if is_big {
-                    12
-                } else {
-                    9
-                }
+            MeldType::SaoChuan | MeldType::KaiDuo => {
+                if is_big { 12 } else { 9 }
             }
         }
     }
@@ -87,8 +51,14 @@ impl Meld {
     }
 
     pub fn huxi(&self) -> u8 {
+        if self.meld_type == MeldType::Chi {
+            // 只有 123 和 2710 有胡息
+            if !Self::is_valid_123(&self.cards) && !Self::is_valid_2710(&self.cards) {
+                return 0;
+            }
+        }
+
         let big_count = self.cards.iter().filter(|c| c.suit == Suit::Big).count();
-        // For SanDa: "is_big" means big-dominant (2 big cards)
         let is_big = if self.meld_type == MeldType::SanDa {
             big_count >= 2
         } else {
@@ -98,6 +68,10 @@ impl Meld {
     }
 
     pub fn is_valid_chi(cards: &[Card]) -> bool {
+        Self::is_valid_123(cards) || Self::is_valid_2710(cards)
+    }
+
+    pub fn is_valid_123(cards: &[Card]) -> bool {
         if cards.len() != 3 {
             return false;
         }
@@ -110,7 +84,7 @@ impl Meld {
         let mut values: Vec<u8> = cards.iter().map(|c| c.value.as_u8()).collect();
         values.sort();
 
-        values[1] == values[0] + 1 && values[2] == values[0] + 2
+        values[0] == 1 && values[1] == 2 && values[2] == 3
     }
 
     pub fn is_valid_2710(cards: &[Card]) -> bool {

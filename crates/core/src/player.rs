@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(transparent)]
 pub struct PlayerId(pub Uuid);
 
 impl PlayerId {
@@ -32,6 +33,9 @@ pub struct Player {
     pub name: String,
     pub state: PlayerState,
     pub is_dealer: bool,
+    pub sp: u32,
+    pub max_sp: u32,
+    pub is_bot: bool,
     pub position: u8,
 }
 
@@ -42,8 +46,17 @@ impl Player {
             name: name.into(),
             state: PlayerState::Idle,
             is_dealer: false,
+            sp: 100,
+            max_sp: 100,
+            is_bot: false,
             position: 0,
         }
+    }
+
+    pub fn new_bot(name: impl Into<String>) -> Self {
+        let mut p = Self::new(name);
+        p.is_bot = true;
+        p
     }
 
     pub fn set_ready(&mut self) {
@@ -56,6 +69,19 @@ impl Player {
 
     pub fn set_dealer(&mut self, is_dealer: bool) {
         self.is_dealer = is_dealer;
+    }
+
+    pub fn consume_sp(&mut self, amount: u32) -> bool {
+        if self.sp >= amount {
+            self.sp -= amount;
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn recover_sp(&mut self, amount: u32) {
+        self.sp = (self.sp + amount).min(self.max_sp);
     }
 }
 
